@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GOLGL</title>
+
+    <link href='https://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+
+    <style>
+      div, input, button, select {
+        font-family: 'Slabo 27px', 'Helvetica Neue', Helvetica, sans-serif;
+        font-size: 18px;
+      }
+
+      button {
+        padding: 8px 14px;
+        width: 100px;
+      }
+
+      input[type=range] {
+        vertical-align: text-bottom;
+      }
+
+      .control-group {
+        margin: 5px 0px 15px 0px;
+      }
+
+      .control-group p {
+        margin: 0px;
+        font-size: 12px;
+        color: #999;
+      }
+
+      #gol {
+        width: 512px;
+        height: 512px;
+      }
+
+      #seed {
+        display: none;
+      }
+    </style>
+
+    <script id="draw-vert-shader" type="x-shader/x-vertex">
+      precision highp float;
+
+      attribute vec3 position;
+
+      varying vec2 out_texCoord;
+
+      void main() {
+        out_texCoord = (position.xy / 2.0) + vec2(0.5, 0.5);
+        gl_Position = vec4(position, 1);
+      }
+    </script>
+
+    <script id="draw-frag-shader" type="x-shader/x-fragment">
+      precision highp float;
+
+      uniform vec2 pixelStep;
+      uniform sampler2D tex;
+
+      varying vec2 out_texCoord;
+
+      void main() {
+        gl_FragColor = texture2D(tex, out_texCoord);
+      }
+    </script>
+
+    <script id="compute-frag-shader" type="x-shader/x-fragment">
+      precision highp float;
+
+      uniform vec2 pixelStep;
+      uniform sampler2D tex;
+      uniform int birth[8];
+      uniform int death[8];
+
+      varying vec2 out_texCoord;
+
+      // Forward decls.
+      int countNeighbours(in sampler2D tex, in vec2 loc);
+      bool isCellAlive(in vec4 cellColor);
+      vec4 nextCycleForLivingCell(in vec4 currentColor, in int neighbourCount);
+      vec4 nextCycleForDeadCell(in vec4 currentColor, in int neighbourCount);
+      bool isContainedIn(in int[8] list, in int value);
+
+      void main() {
+        vec4 cellColor = texture2D(tex, out_texCoord);
+        bool cellAlive = isCellAlive(cellColor);
+        int neighbours = countNeighbours(tex, out_texCoord);
+
+        if (cellAlive) {
+          gl_FragColor = nextCycleForLivingCell(cellColor, neighbours);
+        } else {
+          gl_FragColor = nextCycleForDeadCell(cellColor, neighbours);
+        }
+      }
+
+      int countNeighbours(in sampler2D tex, in vec2 loc) {
+        int count = 0;
+
+        // Sadly, GLSL ES 2.0 doesn't allow constant arrays because it doesn't
+        // support array constructors.
+        vec2 neighbourOffsets[8];
+        neighbourOffsets[0] = vec2(-1.0, -1.0);
+        neighbourOffsets[1] = vec2( 0.0, -1.0);
+        neighbourOffsets[2] = vec2( 1.0, -1.0);
+        neighbourOffsets[3] = vec2(-1.0,  0.0);
+        neighbourOffsets[4] = vec2( 1.0,  0.0);
+        neighbourOffsets[5] = vec2(-1.0,  1.0);
+        neighbourOffsets[6] = vec2( 0.0,  1.0);
+        neighbourOffsets[7] = vec2( 1.0,  1.0);
+
+        for (int i = 0; i < 8; i++) {
+          vec2 neighbourLoc = loc + (neighbourOffsets[i] * pixelStep);
+          vec4 neighbourColor = texture2D(tex, neighbourLoc);
+
+          if (isCellAlive(neighbourColor)) {
+            count++;
+          }
+        }
+
+        return count;
+      }
+
+      bool isCellAlive(in vec4 cellColor) {
+        return cellColor.r == 1.0;
+      }
+
+      vec4 nextCycleForLivingCell(in vec4 currentColor, in int neighbourCount) {
+        if (isContainedIn(birth, neighbourCount)) {
+          return vec4(1.0, currentColor.g + 0.01, 0.3, 1.0);
+        } else {
+          return vec4(0.5, 0.0, 1.0, 1.0);
+        }
+      }
+
+      vec4 nextCycleForDeadCell(in vec4 currentColor, in int neighbourCount) {
+        if (isContainedIn(death, neighbourCount)) {
+          return vec4(1.0, 0.3, 0.3, 1.0);
+        } else {
+          return vec4(currentColor.r - 0.01, 0, currentColor.b - 0.005, 1.0);
+        }
+      }
+
+      bool isContainedIn(in int[8] list, in int value) {
+        for (int i = 0; i < 8; i++) {
+          if (list[i] == value) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="gol" width="128" height="128"></canvas>
+    <canvas id="seed" width="128" height="128"></canvas>
+
+    <div class="control-group">
+      <p>Initial State</p>
+      <button id="clear" type="button">Clear</button>
+      <button id="reseed" type="button">Seed</button>
+    </div>
+
+    <div class="control-group">
+      <p>Playback</p>
+      <button id="step" type="button">Step</button>
+      <button id="play-stop" type="button">Play</button>
+      <label for="speed">Speed</label>
+      <input id="speed" type="range" min="0" max="2" value="2" step="1">
+      <span id="speed-value"></span>
+    </div>
+
+    <div class="control-group">
+      <p>Ruleset</p>
+      <select id="ruleset"></select>
+    </div>
+
+    <script src="gol.js"></script>
+  </body>
+</html>
