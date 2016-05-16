@@ -8,13 +8,17 @@
   * UI Controls
   */
   (function(ui, render) {
-    var clearButton
+    var displayElement
+      , clearButton
       , seedButton
       , stepButton
       , playStopButton
       , speedSlider
       , speedValue
       , ruleSelect
+      , displayResetButton
+      , scaleSlider
+      , scaleValue
       , FAST = 2
       , NORMAL = 1
       , SLOW = 0
@@ -49,6 +53,11 @@
     init();
 
     function init() {
+      displayElement = document.getElementById('gol');
+      displayElement.addEventListener('mousewheel', function(event) {
+        scaleDelta(Math.sign(event.deltaY) * -0.1);
+      });
+
       clearButton = document.getElementById('clear');
       clearButton.addEventListener('click', function() {
         clear();
@@ -85,9 +94,22 @@
         setRules(rule.birth, rule.death);
       });
 
+      displayResetButton = document.getElementById('display-reset');
+      displayResetButton.addEventListener('click', function() {
+        resetDisplay();
+      });
+
+      scaleSlider = document.getElementById('scale');
+      scaleSlider.addEventListener('input', function() {
+        scale(this.valueAsNumber);
+      });
+
+      scaleValue = document.getElementById('scale-value');
+
       state = {
         playing: false,
         speed: FAST,
+        scale: 1.0,
         nextRender: Date.now(),
         ruleset: 0
       };
@@ -127,6 +149,24 @@
       render.setDeaths(deaths);
     }
 
+    function scale(k) {
+      k = Math.min(10, Math.max(1, k));
+
+      state.scale = k;
+      scaleSlider.value = k;
+      updateControls();
+      render.setScale(k);
+      render.draw();
+    }
+
+    function scaleDelta(delta) {
+      scale(state.scale + delta);
+    }
+
+    function resetDisplay() {
+      scale(1.0);
+    }
+
     function togglePlayback() {
       if (state.playing === true) {
         stop();
@@ -139,6 +179,7 @@
       stepButton.disabled = state.playing;
       playStopButton.innerHTML = (state.playing === true) ? 'Stop' : 'Play';
       speedValue.innerHTML = speedLabels[state.speed];
+      scaleValue.innerHTML = 'x' + state.scale;
     }
 
     function runPlayback() {
@@ -202,6 +243,7 @@
       , frameBufferIndex
       , birthRule
       , deathRule
+      , drawScale
       ;
 
     render.clear = clear;
@@ -210,6 +252,7 @@
     render.step = computeNextCycle;
     render.setBirths = setBirths;
     render.setDeaths = setDeaths;
+    render.setScale = setScale;
 
     init();
     clear();
@@ -232,7 +275,7 @@
         'draw-frag-shader'
       );
       computeProgram = compileAndLinkProgram(
-        'draw-vert-shader',
+        'compute-vert-shader',
         'compute-frag-shader'
       );
 
@@ -253,6 +296,8 @@
 
       birthRule = fillArrayToSize([2, 3], 8, -1);
       deathRule = fillArrayToSize([3], 8, -1);
+
+      drawScale = 1.0;
     }
 
     function clear() {
@@ -269,10 +314,10 @@
     }
 
     function seed() {
-      var ctx = seedCanvas.getContext('2d');
-      var blocksize = 5;
+      var ctx = seedCanvas.getContext('2d')
+        , blocksize = 20;
 
-      ctx.fillStyle = '#f00';
+      ctx.fillStyle = '#ff0';
       for (var i = 0; i < 400; i++) {
         ctx.fillRect(
           Math.round(Math.random() * (size.width - blocksize)),
@@ -297,6 +342,10 @@
       deathRule = fillArrayToSize(deaths.slice(), 8, -1);
     }
 
+    function setScale(k) {
+      drawScale = k;
+    }
+
     function fillArrayToSize(arr, size, value) {
       while (arr.length < size) {
         arr.push(value);
@@ -308,6 +357,7 @@
     function draw() {
       gl.useProgram(drawProgram);
       globalUniforms(drawProgram);
+      drawingUniforms(drawProgram);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.clear(gl.COLOR_BUFFER_BIT);
@@ -337,6 +387,12 @@
       var pixelStepUniformLocation = gl.getUniformLocation(program, 'pixelStep');
 
       gl.uniform2fv(pixelStepUniformLocation, [1/size.width, 1/size.height]);
+    }
+
+    function drawingUniforms(program) {
+      var scaleStepUniformLocation = gl.getUniformLocation(program, 'scale');
+
+      gl.uniform1f(scaleStepUniformLocation, drawScale);
     }
 
     function computeUniforms(program) {
@@ -389,7 +445,8 @@
         , fragmentShaderScript = fetchShaderScriptById(fragmentShaderScriptId)
         , vertexShader = compileShader(vertexShaderScript)
         , fragmentShader = compileShader(fragmentShaderScript)
-        , program = gl.createProgram();
+        , program = gl.createProgram()
+        ;
 
       gl.attachShader(program, vertexShader);
       gl.attachShader(program, fragmentShader);
