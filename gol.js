@@ -275,8 +275,10 @@
       ctx.fillStyle = '#f00';
       for (var i = 0; i < 400; i++) {
         ctx.fillRect(
-          Math.random() * (size.width - blocksize), Math.random() * (size.height - blocksize),
-          Math.random() * blocksize, Math.random() * blocksize
+          Math.round(Math.random() * (size.width - blocksize)),
+          Math.round(Math.random() * (size.height - blocksize)),
+          Math.round(Math.random() * blocksize),
+          Math.round(Math.random() * blocksize)
         );
       }
 
