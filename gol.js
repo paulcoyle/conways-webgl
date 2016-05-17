@@ -74,6 +74,7 @@
   (function(ui, drag, render) {
     var displayElement
       , displayDragDispose
+      , justMakeItGoButton
       , clearButton
       , seedButton
       , stepButton
@@ -125,6 +126,11 @@
       });
       displayDragDispose = drag.onDrag(displayElement, function(delta) {
         panBy(delta);
+      });
+
+      justMakeItGoButton = document.getElementById('just-make-it-go');
+      justMakeItGoButton.addEventListener('click', function() {
+        randomStateAndPlay();
       });
 
       clearButton = document.getElementById('clear');
@@ -186,6 +192,20 @@
 
       updateControls();
       addRuleOptions(ruleSelect, rules);
+    }
+
+    function randomStateAndPlay() {
+      var rule;
+
+      state.ruleset = Math.floor(Math.random() * rules.length);
+      rule = rules[state.ruleset];
+      setRules(rule.birth, rule.death);
+
+      state.speed = FAST;
+
+      clear();
+      reseed();
+      play();
     }
 
     function clear() {
@@ -265,6 +285,7 @@
       speedSlider.value = state.speed;
       speedValue.innerHTML = speedLabels[state.speed];
       scaleValue.innerHTML = 'x' + (Math.round(state.scale * 10) / 10);
+      ruleSelect.value = state.ruleset;
     }
 
     function runPlayback() {

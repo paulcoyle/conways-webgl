@@ -16,7 +16,7 @@ div, input, button, select {
   display: none;
 }
 
-#controls {
+.controls-container {
   text-align: center;
 }
 
