@@ -9,6 +9,8 @@
     <script id="draw-vert-shader" type="x-shader/x-vertex">
       precision highp float;
 
+      uniform vec2 pixelStep;
+      uniform vec2 translate;
       uniform float scale;
 
       attribute vec3 position;
@@ -16,12 +18,20 @@
       varying vec2 out_texCoord;
 
       void main() {
-	mat3 rot = mat3(scale, 0.0, 0.0,
-	                0.0, scale, 0.0,
-                        0.0, 0.0, 1.0);
-	vec3 newPos = position * rot;
+        vec2 pan = translate * pixelStep * 2.0;
+
+        mat4 scaleMat = mat4(scale, 0.0, 0.0, 0.0,
+                             0.0, scale, 0.0, 0.0,
+                             0.0, 0.0, 1.0, 0.0,
+                             0.0, 0.0, 0.0, 1.0);
+
+        mat4 translateMat = mat4(1.0, 0.0, 0.0, 0.0,
+                                 0.0, 1.0, 0.0, 0.0,
+                                 0.0, 0.0, 1.0, 0.0,
+                                 pan.x, -pan.y, 0.0, 1.0);
+
         out_texCoord = (position.xy / 2.0) + vec2(0.5, 0.5);
-        gl_Position = vec4(newPos, 1);
+        gl_Position = scaleMat * translateMat * vec4(position, 1.0);
       }
     </script>
 
@@ -113,9 +123,9 @@
 
       vec4 nextCycleForLivingCell(in vec4 currentColor, in int neighbourCount) {
         if (isContainedIn(birth, neighbourCount)) {
-          return vec4(1.0, currentColor.g - 0.01, 0.3, 1.0);
+          return currentColor + vec4(0.0, -0.01, 0.0, 0.0);
         } else {
-          return vec4(0.5, 0.0, 1.0, 1.0);
+          return vec4(0.9, 0.0, 1.0, 1.0);
         }
       }
 
@@ -123,7 +133,8 @@
         if (isContainedIn(death, neighbourCount)) {
           return vec4(1.0, 1.0, 0.3, 1.0);
         } else {
-          return vec4(currentColor.r - 0.01, 0, currentColor.b - 0.005, 1.0);
+          return currentColor + vec4(-0.02, 0, -0.01, 0.0);
+          // return vec4(currentColor.r - 0.01, 0, currentColor.b - 0.005, 1.0);
         }
       }
 
@@ -140,35 +151,38 @@
   </head>
   <body>
     <div id="container">
-      <canvas id="gol" width="512" height="512"></canvas>
-      <canvas id="seed" width="512" height="512"></canvas>
+      <canvas id="gol" width="1024" height="512"></canvas>
+      <canvas id="seed" width="1024" height="512"></canvas>
 
-      <div class="control-group">
-        <p>Initial State</p>
-        <button id="clear" type="button">Clear</button>
-        <button id="reseed" type="button">Seed</button>
-      </div>
-
-      <div class="control-group">
-        <p>Playback</p>
-        <button id="step" type="button">Step</button>
-        <button id="play-stop" type="button">Play</button>
-        <label for="speed">Speed</label>
-        <input id="speed" type="range" min="0" max="2" value="2" step="1">
-        <span id="speed-value"></span>
-      </div>
-
-      <div class="control-group">
-        <p>Ruleset</p>
-        <select id="ruleset"></select>
-      </div>
-
-      <div class="control-group">
-        <p>Display</p>
-	<button id="display-reset" type="button">Reset</button>
-	<label for="scale">Scale</label>
-	<input id="scale" type="range" min="1" max="10" value="1" step="0.001">
-	<span id="scale-value"></span>
+      <div id="controls">
+        <div class="control-group">
+          <p>Initial State</p>
+          <button id="clear" type="button">Clear</button>
+          <button id="reseed" type="button">Seed</button>
+        </div>
+        <div class="control-group">
+          <p>Playback</p>
+          <button id="step" type="button">Step</button>
+          <button id="play-stop" type="button">Play</button>
+          <div class="range">
+            <label for="speed">Speed</label>
+            <input id="speed" type="range" min="0" max="2" value="2" step="1">
+            <span id="speed-value" class="value"></span>
+          </div>
+        </div>
+        <div class="control-group">
+          <p>Ruleset</p>
+          <select id="ruleset"></select>
+        </div>
+        <div class="control-group">
+          <p>Display</p>
+          <button id="display-reset" type="button">Reset</button>
+          <div class="range">
+            <label for="scale">Scale</label>
+            <input id="scale" type="range" min="1" max="10" value="1" step="0.1">
+            <span id="scale-value" class="value"></span>
+          </div>
+        </div>
       </div>
     </div>
 

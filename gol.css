@@ -1,37 +1,65 @@
 div, input, button, select {
   font-family: 'Slabo 27px', 'Helvetica Neue', Helvetica, sans-serif;
-  font-size: 18px;
+  font-size: 14px;
 }
 
-button {
-  padding: 8px 14px;
-  width: 100px;
+#container {
+  width: 1024px;
+  margin: 0px auto;
 }
 
-input[type=range] {
-  vertical-align: text-bottom;
+#gol {
+  cursor: move;
+}
+
+#seed {
+  display: none;
+}
+
+#controls {
+  text-align: center;
 }
 
 .control-group {
-  margin: 5px 0px 15px 0px;
+  display: inline-block;
+  padding: 10px 20px;
+  border-right: 1px solid #ddd;
+}
+.control-group:last-child {
+  position: relative;
+  border-right: none;
 }
 
 .control-group p {
+  text-align: left;
   margin: 0px;
   font-size: 12px;
   color: #999;
 }
 
-#container {
-  width: 536px;
-  margin: 0px auto;
+.control-group .range {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
 }
 
-#gol {
-  width: 512px;
-  height: 512px;
+.control-group .range label {
+  position: absolute;
+  top: -5px;
+  left: 0px;
 }
 
-#seed {
-  display: none;
+.control-group .range input[type=range] {
+  position: relative;
+  top: 10px;
+}
+
+.control-group .range .value {
+  position: absolute;
+  top: -5px;
+  right: 0px;
+}
+
+button {
+  padding: 6px 10px;
 }
