@@ -6,6 +6,11 @@
     <link href="https://fonts.googleapis.com/css?family=Slabo+27px" rel="stylesheet" type="text/css">
     <link href="gol.css" rel="stylesheet" type="text/css">
 
+    <script type="text/javascript" src="gol.js"></script>
+    <script type="text/javascript" src="drag.js"></script>
+    <script type="text/javascript" src="ui.js"></script>
+    <script type="text/javascript" src="render.js"></script>
+
     <script id="draw-vert-shader" type="x-shader/x-vertex">
       precision highp float;
 
@@ -192,6 +197,10 @@
       </div>
     </div>
 
-    <script src="gol.js"></script>
+    <script type="text/javascript">
+      window.onload = function() {
+        gol.init();
+      }
+    </script>
   </body>
 </html>
