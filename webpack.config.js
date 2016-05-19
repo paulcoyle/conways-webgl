@@ -42,6 +42,9 @@ module.exports = {
         loader: 'style-loader!css-loader!stylus-loader',
         test: /\.styl?$/,
         exclude: /node_modules/
+      }, {
+        test: /\.glsl$/,
+        loader: 'webpack-glsl'
       }
     ]
   },
