@@ -18,7 +18,10 @@ App = React.createClass({
       scale: 1,
       offset: {
         x: 0, y: 0
-      }
+      },
+      clearIndex: 0,
+      seedIndex: 0,
+      stepIndex: 0
     };
   },
 
@@ -26,8 +29,23 @@ App = React.createClass({
     return this.state.ruleSets[this.state.currentRuleSetIndex];
   },
 
+  handleStateClear() {
+    this.state.clearIndex += 1;
+    this.setState(this.state);
+  },
+
+  handleStateSeed() {
+    this.state.seedIndex += 1;
+    this.setState(this.state);
+  },
+
   handleRuleSetChange(ruleSetIndex) {
     this.state.currentRuleSetIndex = ruleSetIndex;
+    this.setState(this.state);
+  },
+
+  handleStep() {
+    this.state.stepIndex += 1;
     this.setState(this.state);
   },
 
@@ -60,6 +78,9 @@ App = React.createClass({
     return (
       <div id="container">
         <Render
+          clearIndex={this.state.clearIndex}
+          seedIndex={this.state.seedIndex}
+          stepIndex={this.state.stepIndex}
           ruleSet={this.currentRuleSet()}
           playing={this.state.playing}
           speed={this.state.speed}
@@ -72,7 +93,10 @@ App = React.createClass({
           playing={this.state.playing}
           speed={this.state.speed}
           scale={this.state.scale}
+          onStateClear={this.handleStateClear}
+          onStateSeed={this.handleStateSeed}
           onRuleSetChange={this.handleRuleSetChange}
+          onStep={this.handleStep}
           onPlay={this.handlePlay}
           onStop={this.handleStop}
           onSpeedChange={this.handleSpeedChange}

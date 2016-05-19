@@ -20,7 +20,10 @@ module.exports = React.createClass({
       playing: false,
       speed: 0,
       scale: 1,
+      onStateClear: () => {},
+      onStateSeed: () => {},
       onRuleSetChange: () => {},
+      onStep: () => {},
       onPlay: () => {},
       onStop: () => {},
       onSpeedChange: () => {},
@@ -43,8 +46,20 @@ module.exports = React.createClass({
     });
   },
 
+  handleStateClear() {
+    this.props.onStateClear();
+  },
+
+  handleStateSeed() {
+    this.props.onStateSeed();
+  },
+
   handleRuleChange(e) {
     this.props.onRuleSetChange(e.target.value);
+  },
+
+  handleStep() {
+    this.props.onStep();
   },
 
   handlePlayStop() {
@@ -72,18 +87,20 @@ module.exports = React.createClass({
       <div className="controls-container">
         <div className="control-group">
           <p>Initial State</p>
-          <button type="button">Clear</button>
-          <button type="button">Seed</button>
+          <button type="button" onClick={this.handleStateClear}>Clear</button>
+          <button type="button" onClick={this.handleStateSeed}>Seed</button>
         </div>
+
         <div className="control-group">
           <p>Rules</p>
           <select value={this.props.currentRuleSetIndex} onChange={this.handleRuleChange}>
             {this.ruleOptions()}
           </select>
         </div>
+
         <div className="control-group">
           <p>Simulation</p>
-          <button type="button" disabled={this.props.playing}>Step</button>
+          <button type="button" onClick={this.handleStep} disabled={this.props.playing}>Step</button>
           <button type="button" onClick={this.handlePlayStop}>{this.getPlayStopLabel()}</button>
           <RangeControl
             id="speed"
@@ -94,6 +111,7 @@ module.exports = React.createClass({
             valueLabel={SPEED_LABELS[this.props.speed]}
             onChange={this.handleSpeedChange} />
         </div>
+
         <div className="control-group">
           <p>Display</p>
           <button type="button" onClick={this.handleDisplayReset}>Reset</button>
