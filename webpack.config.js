@@ -15,7 +15,7 @@ module.exports = {
 
   output: {
     path: outputPath(),
-    filename: '/js/bundle.js'
+    filename: 'js/bundle.js'
   },
 
   resolve: {
@@ -75,12 +75,19 @@ function pluginDefinitions() {
 
   plugins.push(
     new webpack.optimize.CommonsChunkPlugin(
-      'vendor', '/js/vendor.bundle.js'
+      'vendor', 'js/vendor.bundle.js'
     )
   );
 
   if (production) {
-    console.log('SHOULDNT be doing source mapping');
+    plugins.push(
+      new webpack.DefinePlugin({
+        'process.env': {
+          'NODE_ENV': JSON.stringify('production')
+        }
+      })
+    );
+
     plugins.push(
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
@@ -89,7 +96,6 @@ function pluginDefinitions() {
       })
     );
   } else {
-    console.log('doing source mapping');
     plugins.push(
       new webpack.SourceMapDevToolPlugin({
         test: /\.jsx?$/
