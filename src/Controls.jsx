@@ -20,6 +20,9 @@ module.exports = React.createClass({
       playing: false,
       speed: 0,
       scale: 1,
+      offset: {
+        x: 0, y: 0
+      },
       onStateClear: () => {},
       onStateSeed: () => {},
       onRuleSetChange: () => {},
@@ -82,6 +85,18 @@ module.exports = React.createClass({
     this.props.onScaleChange(newScale);
   },
 
+  offsetX() {
+    return this.roundValue(this.props.offset.x, 100);
+  },
+
+  offsetY() {
+    return this.roundValue(this.props.offset.y, 100);
+  },
+
+  roundValue(value, decimal) {
+    return Math.round(value * decimal) / decimal;
+  },
+
   render() {
     return (
       <div className="controls-container">
@@ -121,7 +136,12 @@ module.exports = React.createClass({
             range={this.state.scaleRange}
             step="0.1"
             value={this.props.scale}
+            valueLabelRounding="100"
             onChange={this.handleScaleChange} />
+
+          <div className="coords">
+            <p>(<span>{this.offsetX()}</span>,<span>{this.offsetY()}</span>)</p>
+          </div>
         </div>
       </div>
     );

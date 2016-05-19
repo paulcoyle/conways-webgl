@@ -29,6 +29,21 @@ App = React.createClass({
     return this.state.ruleSets[this.state.currentRuleSetIndex];
   },
 
+  setScale(scale) {
+    this.state.scale = Math.min(10, Math.max(1, scale));
+    this.setState(this.state);
+  },
+
+  handleRenderDrag(offset) {
+    this.state.offset.x += offset.x / this.state.scale;
+    this.state.offset.y += offset.y / this.state.scale;
+    this.setState(this.state);
+  },
+
+  handleRenderZoom(deltaScale) {
+    this.setScale(this.state.scale + (deltaScale * this.state.scale));
+  },
+
   handleStateClear() {
     this.state.clearIndex += 1;
     this.setState(this.state);
@@ -66,6 +81,8 @@ App = React.createClass({
 
   handleDisplayReset() {
     this.state.scale = 1;
+    this.state.offset.x = 0;
+    this.state.offset.y = 0;
     this.setState(this.state);
   },
 
@@ -85,7 +102,9 @@ App = React.createClass({
           playing={this.state.playing}
           speed={this.state.speed}
           scale={this.state.scale}
-          offset={this.state.offset} />
+          offset={this.state.offset}
+          onDrag={this.handleRenderDrag}
+          onZoom={this.handleRenderZoom} />
 
         <Controls
           ruleSets={this.state.ruleSets}
@@ -93,6 +112,7 @@ App = React.createClass({
           playing={this.state.playing}
           speed={this.state.speed}
           scale={this.state.scale}
+          offset={this.state.offset}
           onStateClear={this.handleStateClear}
           onStateSeed={this.handleStateSeed}
           onRuleSetChange={this.handleRuleSetChange}

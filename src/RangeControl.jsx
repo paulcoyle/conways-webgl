@@ -8,6 +8,7 @@ module.exports = React.createClass({
       id: '__none__',
       label: 'Range',
       valueLabel: null,
+      valueLabelRounding: 1,
       range: {
         min: 0,
         max: 1
@@ -22,7 +23,7 @@ module.exports = React.createClass({
     if (this.props.valueLabel !== null) {
       return this.props.valueLabel;
     } else {
-      return this.props.value;
+      return Math.round(parseFloat(this.props.value) * this.props.valueLabelRounding) / this.props.valueLabelRounding;
     }
   },
 
