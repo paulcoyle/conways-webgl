@@ -96,6 +96,15 @@ App = React.createClass({
     this.setState(this.state);
   },
 
+  handleImpatientUser() {
+    this.state.currentRuleSetIndex = Math.floor(Math.random() * this.state.ruleSets.length);
+    this.state.clearIndex += 1;
+    this.state.seedIndex += 5;
+    this.state.speed = 2;
+    this.state.playing = true;
+    this.setState(this.state);
+  },
+
   render() {
     return (
       <div id="container">
@@ -127,7 +136,8 @@ App = React.createClass({
           onStop={this.handleStop}
           onSpeedChange={this.handleSpeedChange}
           onDisplayReset={this.handleDisplayReset}
-          onScaleChange={this.handleScaleChange} />
+          onScaleChange={this.handleScaleChange}
+          onImpatientUser={this.handleImpatientUser} />
       </div>
     );
   }

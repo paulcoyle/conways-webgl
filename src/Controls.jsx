@@ -31,7 +31,8 @@ module.exports = React.createClass({
       onStop: () => {},
       onSpeedChange: () => {},
       onDisplayReset: () => {},
-      onScaleChange: () => {}
+      onScaleChange: () => {},
+      onImpatientUser: () => {}
     };
   },
 
@@ -85,6 +86,10 @@ module.exports = React.createClass({
     this.props.onScaleChange(newScale);
   },
 
+  handleImpatientUser() {
+    this.props.onImpatientUser();
+  },
+
   offsetX() {
     return this.roundValue(this.props.offset.x, 100);
   },
@@ -99,48 +104,55 @@ module.exports = React.createClass({
 
   render() {
     return (
-      <div className="controls-container">
-        <div className="control-group">
-          <p>Initial State</p>
-          <button type="button" onClick={this.handleStateClear}>Clear</button>
-          <button type="button" onClick={this.handleStateSeed}>Seed</button>
+      <div>
+        <div className="controls-container">
+          <div className="control-group">
+            <button type="button" onClick={this.handleImpatientUser}>Just Do Something Cool</button>
+          </div>
         </div>
+        <div className="controls-container">
+          <div className="control-group">
+            <p>Initial State</p>
+            <button type="button" onClick={this.handleStateClear}>Clear</button>
+            <button type="button" onClick={this.handleStateSeed}>Seed</button>
+          </div>
 
-        <div className="control-group">
-          <p>Rules</p>
-          <select value={this.props.currentRuleSetIndex} onChange={this.handleRuleChange}>
-            {this.ruleOptions()}
-          </select>
-        </div>
+          <div className="control-group">
+            <p>Rules</p>
+            <select value={this.props.currentRuleSetIndex} onChange={this.handleRuleChange}>
+              {this.ruleOptions()}
+            </select>
+          </div>
 
-        <div className="control-group">
-          <p>Simulation</p>
-          <button type="button" onClick={this.handleStep} disabled={this.props.playing}>Step</button>
-          <button type="button" onClick={this.handlePlayStop}>{this.getPlayStopLabel()}</button>
-          <RangeControl
-            id="speed"
-            label="Speed"
-            range={this.state.speedRange}
-            step="1"
-            value={this.props.speed}
-            valueLabel={SPEED_LABELS[this.props.speed]}
-            onChange={this.handleSpeedChange} />
-        </div>
+          <div className="control-group">
+            <p>Simulation</p>
+            <button type="button" onClick={this.handleStep} disabled={this.props.playing}>Step</button>
+            <button type="button" onClick={this.handlePlayStop}>{this.getPlayStopLabel()}</button>
+            <RangeControl
+              id="speed"
+              label="Speed"
+              range={this.state.speedRange}
+              step="1"
+              value={this.props.speed}
+              valueLabel={SPEED_LABELS[this.props.speed]}
+              onChange={this.handleSpeedChange} />
+          </div>
 
-        <div className="control-group">
-          <p>Display</p>
-          <button type="button" onClick={this.handleDisplayReset}>Reset</button>
-          <RangeControl
-            id="scale"
-            label="Scale"
-            range={this.state.scaleRange}
-            step="0.1"
-            value={this.props.scale}
-            valueLabelRounding="100"
-            onChange={this.handleScaleChange} />
+          <div className="control-group">
+            <p>Display</p>
+            <button type="button" onClick={this.handleDisplayReset}>Reset</button>
+            <RangeControl
+              id="scale"
+              label="Scale"
+              range={this.state.scaleRange}
+              step="0.1"
+              value={this.props.scale}
+              valueLabelRounding="100"
+              onChange={this.handleScaleChange} />
 
-          <div className="coords">
-            <p>(<span>{this.offsetX()}</span>,<span>{this.offsetY()}</span>)</p>
+            <div className="coords">
+              <p>(<span>{this.offsetX()}</span>,<span>{this.offsetY()}</span>)</p>
+            </div>
           </div>
         </div>
       </div>
