@@ -1,0 +1,36 @@
+{
+  "name": "conways-webgl",
+  "version": "0.1.0",
+  "description": "A simple implementation of Conway's Game of Life in WebGL.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulcoyle/conways-webgl.git"
+  },
+  "author": "Paul Coyle <paul@paulcoyle.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paulcoyle/conways-webgl/issues"
+  },
+  "homepage": "https://github.com/paulcoyle/conways-webgl#readme",
+  "devDependencies": {
+    "babel-core": "^6.9.0",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "css-loader": "^0.23.1",
+    "html-webpack-plugin": "^2.17.0",
+    "nib": "^1.1.0",
+    "raf": "^3.2.0",
+    "react": "^15.0.2",
+    "react-dom": "^15.0.2",
+    "style-loader": "^0.13.1",
+    "stylus-loader": "^2.0.0",
+    "webpack": "^1.13.0",
+    "webpack-dev-server": "^1.14.1",
+    "webpack-glsl-loader": "^1.0.1"
+  }
+}
