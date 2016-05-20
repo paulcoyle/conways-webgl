@@ -4,6 +4,7 @@ var React = require('react')
   , Controls = require('./Controls')
   , Rules = require('../lib/Rules')
   , App
+  , frameDurations = [1000 / 2.0, 1000 / 15.0, 1000 / 60.0];
   ;
 
 require('./App.styl');
@@ -27,6 +28,10 @@ App = React.createClass({
 
   currentRuleSet() {
     return this.state.ruleSets[this.state.currentRuleSetIndex];
+  },
+
+  currentFrameDuration() {
+    return frameDurations[this.state.speed];
   },
 
   setScale(scale) {
@@ -100,6 +105,7 @@ App = React.createClass({
           stepIndex={this.state.stepIndex}
           ruleSet={this.currentRuleSet()}
           playing={this.state.playing}
+          frameDuration={this.currentFrameDuration()}
           speed={this.state.speed}
           scale={this.state.scale}
           offset={this.state.offset}

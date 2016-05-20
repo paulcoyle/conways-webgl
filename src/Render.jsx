@@ -1,4 +1,5 @@
 var React = require('react')
+  , raf = require('raf')
   , createRenderer = require('../lib/Renderer.js')
   , createDragWatcher = require('../lib/Drag.js')
   ;
@@ -10,12 +11,16 @@ module.exports = React.createClass({
     return {
       clearIndex: 0,
       seedIndex: 0,
-      stepIndex: 0
+      stepIndex: 0,
+      rafHandle: null,
+      nextFrameDeadline: 0
     };
   },
 
   getDefaultProps() {
     return {
+      playing: false,
+      frameDuration: 500,
       onDrag: () => {},
       onZoom: () => {}
     };
@@ -27,7 +32,6 @@ module.exports = React.createClass({
   },
 
   componentWillReceiveProps(newProps) {
-    console.log(newProps.offset);
     this.executeClears(newProps);
     this.executeSeeds(newProps);
     this._renderer.setScale(newProps.scale);
@@ -35,6 +39,7 @@ module.exports = React.createClass({
     this._renderer.setBirths(newProps.ruleSet.birth);
     this._renderer.setDeaths(newProps.ruleSet.death);
     this.executeSteps(newProps);
+    this.executePlayback(newProps);
 
     this._renderer.draw();
   },
@@ -73,12 +78,36 @@ module.exports = React.createClass({
     });
   },
 
+  executePlayback(props) {
+    if (props.playing === true && this.state.rafHandle === null) {
+      this.state.nextFrameDeadline = Date.now();
+      this.setState(this.state);
+      this.handlePlaybackFrame();
+    } else if (props.playing === false && this.state.rafHandle !== null) {
+      raf.cancel(this.state.rafHandle);
+      this.state.rafHandle = null;
+      this.setState(this.state);
+    }
+  },
+
+  handlePlaybackFrame() {
+    if (Date.now() > this.state.nextFrameDeadline) {
+      this._renderer.step();
+      this._renderer.draw();
+      this.state.nextFrameDeadline = Date.now() + this.props.frameDuration;
+    }
+
+    this.state.rafHandle = raf(this.handlePlaybackFrame);
+    this.setState(this.state);
+  },
+
   handleDrag(deltas) {
     this.props.onDrag(deltas);
   },
 
   handleRenderWheel(event) {
-    this.props.onZoom(Math.sign(event.deltaY) * -0.1);
+    event.preventDefault();
+    this.props.onZoom(Math.sign(event.deltaY) * -0.025);
   },
 
   render() {
