@@ -36,8 +36,8 @@ module.exports = React.createClass({
     this.executeSeeds(newProps);
     this._renderer.setScale(newProps.scale);
     this._renderer.setPan(newProps.offset.x, newProps.offset.y);
-    this._renderer.setBirths(newProps.ruleSet.birth);
-    this._renderer.setDeaths(newProps.ruleSet.death);
+    this._renderer.setLiveRule(newProps.ruleSet.live);
+    this._renderer.setDeadRule(newProps.ruleSet.dead);
     this.executeSteps(newProps);
     this.executePlayback(newProps);
 
