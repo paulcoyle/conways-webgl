@@ -54,14 +54,14 @@ int countNeighbours(in sampler2D tex, in vec2 loc) {
 }
 
 bool isCellAlive(in vec4 cellColor) {
-  return cellColor.r == 1.0;
+  return cellColor.a == 1.0;
 }
 
 vec4 nextCycleForLivingCell(in vec4 currentColor, in int neighbourCount) {
   if (isContainedIn(birth, neighbourCount)) {
     return currentColor + vec4(0.0, -0.01, 0.0, 0.0);
   } else {
-    return vec4(0.9, 0.0, 1.0, 1.0);
+    return vec4(0.9, 0.0, 1.0, 0.0);
   }
 }
 
