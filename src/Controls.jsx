@@ -26,6 +26,7 @@ module.exports = React.createClass({
       onStateClear: () => {},
       onStateSeed: () => {},
       onRuleSetChange: () => {},
+      onColoringChange: () => {},
       onStep: () => {},
       onPlay: () => {},
       onStop: () => {},
@@ -50,6 +51,12 @@ module.exports = React.createClass({
     });
   },
 
+  coloringOptions() {
+    return this.props.colorings.map((coloring, i) => {
+      return <option key={i} value={i}>{coloring.label}</option>
+    });
+  },
+
   handleStateClear() {
     this.props.onStateClear();
   },
@@ -60,6 +67,10 @@ module.exports = React.createClass({
 
   handleRuleChange(e) {
     this.props.onRuleSetChange(e.target.value);
+  },
+
+  handleColoringChange(e) {
+    this.props.onColoringChange(e.target.value);
   },
 
   handleStep() {
@@ -137,7 +148,8 @@ module.exports = React.createClass({
               valueLabel={SPEED_LABELS[this.props.speed]}
               onChange={this.handleSpeedChange} />
           </div>
-
+        </div>
+        <div className="controls-container">
           <div className="control-group">
             <p>Display</p>
             <button type="button" onClick={this.handleDisplayReset}>Reset</button>
@@ -153,6 +165,12 @@ module.exports = React.createClass({
             <div className="coords">
               <p>(<span>{this.offsetX()}</span>,<span>{this.offsetY()}</span>)</p>
             </div>
+          </div>
+          <div className="control-group">
+            <p>Colouring</p>
+            <select value={this.props.currentColoringIndex} onChange={this.handleColoringChange}>
+              {this.coloringOptions()}
+            </select>
           </div>
         </div>
       </div>
