@@ -2,8 +2,14 @@ precision highp float;
 
 uniform vec2 pixelStep;
 uniform sampler2D tex;
+
 uniform int liveRule[8];
 uniform int deadRule[8];
+
+uniform vec3 liveInitialColor;
+uniform vec3 liveColorStep;
+uniform vec3 deadInitialColor;
+uniform vec3 deadColorStep;
 
 varying vec2 out_texCoord;
 
@@ -78,9 +84,9 @@ vec4 nextCycleForLivingCell(in vec4 currentColor,
                             in int neighbourCount,
                             in vec3 offspringColor) {
   if (isContainedIn(liveRule, neighbourCount)) {
-    return currentColor + vec4(0.0, -0.01, 0.0, 0.0);
+    return currentColor + vec4(liveColorStep, 0.0);
   } else {
-    return vec4(1.0, 0.0, 1.0, 0.0);
+    return vec4(deadInitialColor, 0.0);
   }
 }
 
@@ -88,9 +94,9 @@ vec4 nextCycleForDeadCell(in vec4 currentColor,
                           in int neighbourCount,
                           in vec3 offspringColor) {
   if (isContainedIn(deadRule, neighbourCount)) {
-    return vec4(1.0, 1.0, 0.0, 1.0);
+    return vec4(liveInitialColor, 1.0);
   } else {
-    return currentColor + vec4(-0.02, 0, -0.01, 0.0);
+    return currentColor + vec4(deadColorStep, 0.0);
   }
 }
 
