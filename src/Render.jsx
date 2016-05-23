@@ -42,15 +42,16 @@ module.exports = React.createClass({
 
   updateWithProps(props) {
     this.executeClears(props);
-    this.executeSeeds(props);
     this._renderer.setScale(props.scale);
     this._renderer.setPan(props.offset.x, props.offset.y);
     this._renderer.setLiveRule(props.ruleSet.live);
     this._renderer.setDeadRule(props.ruleSet.dead);
+    this._renderer.setColorType(props.coloring.type);
     this._renderer.setLiveColoring(props.coloring.liveInitial,
                                    props.coloring.liveStep);
     this._renderer.setDeadColoring(props.coloring.deadInitial,
                                    props.coloring.deadStep);
+    this.executeSeeds(props);
     this.executeSteps(props);
     this.executePlayback(props);
 

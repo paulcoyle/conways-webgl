@@ -148,8 +148,7 @@ module.exports = React.createClass({
               valueLabel={SPEED_LABELS[this.props.speed]}
               onChange={this.handleSpeedChange} />
           </div>
-        </div>
-        <div className="controls-container">
+
           <div className="control-group">
             <p>Display</p>
             <button type="button" onClick={this.handleDisplayReset}>Reset</button>
@@ -161,10 +160,6 @@ module.exports = React.createClass({
               value={this.props.scale}
               valueLabelRounding="100"
               onChange={this.handleScaleChange} />
-
-            <div className="coords">
-              <p>(<span>{this.offsetX()}</span>,<span>{this.offsetY()}</span>)</p>
-            </div>
           </div>
           <div className="control-group">
             <p>Colouring</p>
