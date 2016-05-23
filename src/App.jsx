@@ -3,6 +3,7 @@ var React = require('react')
   , Render = require('./Render')
   , Controls = require('./Controls')
   , Rules = require('../lib/Rules')
+  , Coloring = require('../lib/Coloring')
   , App
   , frameDurations = [1000 / 2.0, 1000 / 15.0, 1000 / 60.0];
   ;
@@ -14,6 +15,8 @@ App = React.createClass({
     return {
       ruleSets: Rules.ruleSets,
       currentRuleSetIndex: 0,
+      colorings: Coloring.colorings,
+      currentColoringIndex: 0,
       playing: false,
       speed: 1,
       scale: 1,
@@ -28,6 +31,10 @@ App = React.createClass({
 
   currentRuleSet() {
     return this.state.ruleSets[this.state.currentRuleSetIndex];
+  },
+
+  currentColoring() {
+    return this.state.colorings[this.state.currentColoringIndex];
   },
 
   currentFrameDuration() {
@@ -61,6 +68,11 @@ App = React.createClass({
 
   handleRuleSetChange(ruleSetIndex) {
     this.state.currentRuleSetIndex = ruleSetIndex;
+    this.setState(this.state);
+  },
+
+  handleColoringChange(coloringIndex) {
+    this.state.currentColoringIndex = coloringIndex;
     this.setState(this.state);
   },
 
@@ -98,8 +110,9 @@ App = React.createClass({
 
   handleImpatientUser() {
     this.state.currentRuleSetIndex = Math.floor(Math.random() * this.state.ruleSets.length);
+    this.state.currentColoringIndex = Math.floor(Math.random() * (this.state.colorings.length - 1)) + 1;
     this.state.clearIndex += 1;
-    this.state.seedIndex += 5;
+    this.state.seedIndex += Math.floor(Math.random() * 4) + 1;
     this.state.speed = 2;
     this.state.playing = true;
     this.setState(this.state);
@@ -113,6 +126,7 @@ App = React.createClass({
           seedIndex={this.state.seedIndex}
           stepIndex={this.state.stepIndex}
           ruleSet={this.currentRuleSet()}
+          coloring={this.currentColoring()}
           playing={this.state.playing}
           frameDuration={this.currentFrameDuration()}
           speed={this.state.speed}
@@ -124,6 +138,8 @@ App = React.createClass({
         <Controls
           ruleSets={this.state.ruleSets}
           currentRuleSetIndex={this.state.currentRuleSetIndex}
+          colorings={this.state.colorings}
+          currentColoringIndex={this.state.currentColoringIndex}
           playing={this.state.playing}
           speed={this.state.speed}
           scale={this.state.scale}
@@ -131,6 +147,7 @@ App = React.createClass({
           onStateClear={this.handleStateClear}
           onStateSeed={this.handleStateSeed}
           onRuleSetChange={this.handleRuleSetChange}
+          onColoringChange={this.handleColoringChange}
           onStep={this.handleStep}
           onPlay={this.handlePlay}
           onStop={this.handleStop}

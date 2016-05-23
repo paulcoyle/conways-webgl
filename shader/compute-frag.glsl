@@ -2,31 +2,68 @@ precision highp float;
 
 uniform vec2 pixelStep;
 uniform sampler2D tex;
-uniform int birth[8];
-uniform int death[8];
+
+uniform int liveRule[8];
+uniform int deadRule[8];
+
+uniform int colorType;
+uniform vec3 liveInitialColor;
+uniform vec3 liveColorStep;
+uniform vec3 deadInitialColor;
+uniform vec3 deadColorStep;
 
 varying vec2 out_texCoord;
 
 // Forward decls.
-int countNeighbours(in sampler2D tex, in vec2 loc);
+int countNeighbours(in sampler2D tex,
+                    in vec2 loc,
+                    out vec3 offspringColor);
+
 bool isCellAlive(in vec4 cellColor);
-vec4 nextCycleForLivingCell(in vec4 currentColor, in int neighbourCount);
-vec4 nextCycleForDeadCell(in vec4 currentColor, in int neighbourCount);
+
+vec4 nextCycleForLivingCell(in vec4 currentColor,
+                            in int neighbourCount,
+                            in vec3 offspringColor);
+
+vec4 nextCycleForDeadCell(in vec4 currentColor,
+                          in int neighbourCount,
+                          in vec3 offspringColor);
+
+vec4 decayedColorForLivingCell(in vec4 currentColor,
+                               in int neighbourCount,
+                               in vec3 offspringColor);
+
+vec4 decayedColorForDeadCell(in vec4 currentColor,
+                             in int neighbourCount,
+                             in vec3 offspringColor);
+
+vec4 neighbourColorForLivingCell(in vec4 currentColor,
+                                 in int neighbourCount,
+                                 in vec3 offspringColor);
+
+vec4 neighbourColorForDeadCell(in vec4 currentColor,
+                               in int neighbourCount,
+                               in vec3 offspringColor);
+
 bool isContainedIn(in int[8] list, in int value);
 
+// Program and functions.
 void main() {
   vec4 cellColor = texture2D(tex, out_texCoord);
   bool cellAlive = isCellAlive(cellColor);
-  int neighbours = countNeighbours(tex, out_texCoord);
+  vec3 offspringColor = vec3(0.0);
+  int neighbours = countNeighbours(tex, out_texCoord, offspringColor);
 
   if (cellAlive) {
-    gl_FragColor = nextCycleForLivingCell(cellColor, neighbours);
+    gl_FragColor = nextCycleForLivingCell(cellColor, neighbours, offspringColor);
   } else {
-    gl_FragColor = nextCycleForDeadCell(cellColor, neighbours);
+    gl_FragColor = nextCycleForDeadCell(cellColor, neighbours, offspringColor);
   }
 }
 
-int countNeighbours(in sampler2D tex, in vec2 loc) {
+// For speed, this function calculates what an offspring colour would be in
+// the case of neighbour colouring while counting neighbours.
+int countNeighbours(in sampler2D tex, in vec2 loc, out vec3 offspringColor) {
   int count = 0;
 
   // Sadly, GLSL ES 2.0 doesn't allow constant arrays because it doesn't
@@ -41,35 +78,84 @@ int countNeighbours(in sampler2D tex, in vec2 loc) {
   neighbourOffsets[6] = vec2( 0.0,  1.0);
   neighbourOffsets[7] = vec2( 1.0,  1.0);
 
+  offspringColor = vec3(0.0, 0.0, 0.0);
+
   for (int i = 0; i < 8; i++) {
     vec2 neighbourLoc = loc + (neighbourOffsets[i] * pixelStep);
     vec4 neighbourColor = texture2D(tex, neighbourLoc);
 
     if (isCellAlive(neighbourColor)) {
+      offspringColor += neighbourColor.rgb;
       count++;
     }
   }
+
+  offspringColor /= float(count);
 
   return count;
 }
 
 bool isCellAlive(in vec4 cellColor) {
-  return cellColor.r == 1.0;
+  return cellColor.a == 1.0;
 }
 
-vec4 nextCycleForLivingCell(in vec4 currentColor, in int neighbourCount) {
-  if (isContainedIn(birth, neighbourCount)) {
-    return currentColor + vec4(0.0, -0.01, 0.0, 0.0);
-  } else {
-    return vec4(0.9, 0.0, 1.0, 1.0);
+vec4 nextCycleForLivingCell(in vec4 currentColor,
+                            in int neighbourCount,
+                            in vec3 offspringColor) {
+  if (colorType == 1) {
+    return decayedColorForLivingCell(currentColor, neighbourCount, offspringColor);
+  } else if (colorType == 2) {
+    return neighbourColorForLivingCell(currentColor, neighbourCount, offspringColor);
   }
 }
 
-vec4 nextCycleForDeadCell(in vec4 currentColor, in int neighbourCount) {
-  if (isContainedIn(death, neighbourCount)) {
-    return vec4(1.0, 1.0, 0.3, 1.0);
+vec4 nextCycleForDeadCell(in vec4 currentColor,
+                          in int neighbourCount,
+                          in vec3 offspringColor) {
+  if (colorType == 1) {
+    return decayedColorForDeadCell(currentColor, neighbourCount, offspringColor);
+  } else if (colorType == 2) {
+    return neighbourColorForDeadCell(currentColor, neighbourCount, offspringColor);
+  }
+}
+
+vec4 decayedColorForLivingCell(in vec4 currentColor,
+                               in int neighbourCount,
+                               in vec3 offspringColor) {
+  if (isContainedIn(liveRule, neighbourCount)) {
+    return currentColor + vec4(liveColorStep, 0.0);
   } else {
-    return currentColor + vec4(-0.02, 0, -0.01, 0.0);
+    return vec4(deadInitialColor, 0.0);
+  }
+}
+
+vec4 decayedColorForDeadCell(in vec4 currentColor,
+                               in int neighbourCount,
+                               in vec3 offspringColor) {
+  if (isContainedIn(deadRule, neighbourCount)) {
+    return vec4(liveInitialColor, 1.0);
+  } else {
+    return currentColor + vec4(deadColorStep, 0.0);
+  }
+}
+
+vec4 neighbourColorForLivingCell(in vec4 currentColor,
+                                 in int neighbourCount,
+                                 in vec3 offspringColor) {
+  if (isContainedIn(liveRule, neighbourCount)) {
+    return currentColor;
+  } else {
+    return vec4(0.0);
+  }
+}
+
+vec4 neighbourColorForDeadCell(in vec4 currentColor,
+                               in int neighbourCount,
+                               in vec3 offspringColor) {
+  if (isContainedIn(deadRule, neighbourCount)) {
+    return vec4(offspringColor, 1.0);
+  } else {
+    return vec4(0.0);
   }
 }
 

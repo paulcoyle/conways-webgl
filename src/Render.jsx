@@ -29,23 +29,33 @@ module.exports = React.createClass({
   componentDidMount() {
     this._renderer = createRenderer(this.refs.render, this.refs.seed);
     this._dragDispose = createDragWatcher(this.refs.render, this.handleDrag);
+    this.updateWithProps(this.props);
   },
 
   componentWillReceiveProps(newProps) {
-    this.executeClears(newProps);
-    this.executeSeeds(newProps);
-    this._renderer.setScale(newProps.scale);
-    this._renderer.setPan(newProps.offset.x, newProps.offset.y);
-    this._renderer.setBirths(newProps.ruleSet.birth);
-    this._renderer.setDeaths(newProps.ruleSet.death);
-    this.executeSteps(newProps);
-    this.executePlayback(newProps);
-
-    this._renderer.draw();
+    this.updateWithProps(newProps);
   },
 
   componentWillUnmount() {
     this._dragDispose();
+  },
+
+  updateWithProps(props) {
+    this.executeClears(props);
+    this._renderer.setScale(props.scale);
+    this._renderer.setPan(props.offset.x, props.offset.y);
+    this._renderer.setLiveRule(props.ruleSet.live);
+    this._renderer.setDeadRule(props.ruleSet.dead);
+    this._renderer.setColorType(props.coloring.type);
+    this._renderer.setLiveColoring(props.coloring.liveInitial,
+                                   props.coloring.liveStep);
+    this._renderer.setDeadColoring(props.coloring.deadInitial,
+                                   props.coloring.deadStep);
+    this.executeSeeds(props);
+    this.executeSteps(props);
+    this.executePlayback(props);
+
+    this._renderer.draw();
   },
 
   executeIndexedPairing(props, indexName, fn) {
