@@ -31,7 +31,7 @@ module.exports = {
     loaders: [
       {
         loader: 'babel',
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         query: {
           presets: [ 'react'
@@ -45,6 +45,12 @@ module.exports = {
       }, {
         test: /\.glsl$/,
         loader: 'webpack-glsl'
+      }, {
+        test: /\.svg$/,
+        loader: 'svg-sprite?' + JSON.stringify({
+          name: '[name]_[hash]',
+          prefixize: true
+        })
       }
     ]
   },
