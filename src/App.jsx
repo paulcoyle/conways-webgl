@@ -110,7 +110,7 @@ App = React.createClass({
 
   handleImpatientUser() {
     this.state.currentRuleSetIndex = Math.floor(Math.random() * this.state.ruleSets.length);
-    this.state.currentColoringIndex = Math.floor(Math.random() * (this.state.colorings.length - 1)) + 1;
+    this.state.currentColoringIndex = Math.floor(Math.random() * this.state.colorings.length);
     this.state.clearIndex += 1;
     this.state.seedIndex += Math.floor(Math.random() * 4) + 1;
     this.state.speed = 2;

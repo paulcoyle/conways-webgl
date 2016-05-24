@@ -1,6 +1,9 @@
 var React = require('react')
+  , Icon = require('./Icon')
   , SelectControl = require('./SelectControl')
   , RangeControl = require('./RangeControl')
+  , controlsIconId = require('../res/svg/control-dial.svg')
+  , magicWandIconId = require('../res/svg/magic-wand.svg')
   , SPEED_LABELS = ['Slow', 'Normal', 'Fast']
   ;
 
@@ -102,12 +105,28 @@ module.exports = React.createClass({
     return Math.round(value * decimal) / decimal;
   },
 
+  currentRuleSetLabel() {
+    return this.props.ruleSets[this.props.currentRuleSetIndex].label;
+  },
+
+  currentColoringLabel() {
+    return this.props.colorings[this.props.currentColoringIndex].label;
+  },
+
   render() {
     return (
       <div>
         <div className="controls-container">
+          <p id="rule-color-label">{this.currentRuleSetLabel()}, {this.currentColoringLabel()}</p>
           <div className="control-group">
-            <button type="button" className="focusable" onClick={this.handleImpatientUser}>Just Do Something Cool</button>
+            <button type="button" className="iconified focusable">
+              <Icon id={controlsIconId} width={20} height={20} /> I Need Control
+            </button>
+          </div>
+          <div className="control-group">
+            <button type="button" className="iconified focusable" onClick={this.handleImpatientUser}>
+              <Icon id={magicWandIconId} width={20} height={20} /> Just Do Something
+            </button>
           </div>
         </div>
 
