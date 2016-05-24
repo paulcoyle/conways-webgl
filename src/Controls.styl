@@ -1,3 +1,13 @@
+#controls-wrapper
+  transform: translate(0px, 20px)
+  opacity: 0
+  transition: transform 0.2s ease-in-out,
+              opacity 0.2s ease-in-out
+
+  &.active
+    transform: translate(0px, 0px)
+    opacity: 1
+
 #rule-color-label
   position: absolute
   top: 0px

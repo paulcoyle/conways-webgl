@@ -13,6 +13,7 @@ require('./App.styl');
 App = React.createClass({
   getInitialState() {
     return {
+      controlsActive: false,
       ruleSets: Rules.ruleSets,
       currentRuleSetIndex: 0,
       colorings: Coloring.colorings,
@@ -43,6 +44,16 @@ App = React.createClass({
 
   setScale(scale) {
     this.state.scale = Math.min(10, Math.max(1, scale));
+    this.setState(this.state);
+  },
+
+  handleControlsActivation() {
+    this.state.controlsActive = true;
+    this.setState(this.state);
+  },
+
+  handleControlsDeactivation() {
+    this.state.controlsActive = false;
     this.setState(this.state);
   },
 
@@ -136,6 +147,7 @@ App = React.createClass({
           onZoom={this.handleRenderZoom} />
 
         <Controls
+          active={this.state.controlsActive}
           ruleSets={this.state.ruleSets}
           currentRuleSetIndex={this.state.currentRuleSetIndex}
           colorings={this.state.colorings}
@@ -144,6 +156,8 @@ App = React.createClass({
           speed={this.state.speed}
           scale={this.state.scale}
           offset={this.state.offset}
+          onActivate={this.handleControlsActivation}
+          onDeactivate={this.handleControlsDeactivation}
           onStateClear={this.handleStateClear}
           onStateSeed={this.handleStateSeed}
           onRuleSetChange={this.handleRuleSetChange}

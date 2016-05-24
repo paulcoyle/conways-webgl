@@ -3,6 +3,7 @@ var React = require('react')
   , SelectControl = require('./SelectControl')
   , RangeControl = require('./RangeControl')
   , controlsIconId = require('../res/svg/control-dial.svg')
+  , scaryControlsIconId = require('../res/svg/scary-controls.svg')
   , magicWandIconId = require('../res/svg/magic-wand.svg')
   , SPEED_LABELS = ['Slow', 'Normal', 'Fast']
   ;
@@ -19,6 +20,7 @@ module.exports = React.createClass({
 
   getDefaultProps() {
     return {
+      active: false,
       ruleSets: [],
       currentRuleSetIndex: -1,
       playing: false,
@@ -27,6 +29,8 @@ module.exports = React.createClass({
       offset: {
         x: 0, y: 0
       },
+      onActivate: () => {},
+      onDeactivate: () => {},
       onStateClear: () => {},
       onStateSeed: () => {},
       onRuleSetChange: () => {},
@@ -89,8 +93,26 @@ module.exports = React.createClass({
     this.props.onScaleChange(newScale);
   },
 
+  handleControlFreakUser() {
+    this.props.onActivate();
+  },
+
+  handleLaiserFaireUser() {
+    this.props.onDeactivate();
+  },
+
   handleImpatientUser() {
     this.props.onImpatientUser();
+  },
+
+  controlsWrapperClassNames() {
+    var classes = ['controls-container'];
+
+    if (this.props.active === true) {
+      classes.push('active');
+    }
+
+    return classes.join(' ');
   },
 
   offsetX() {
@@ -113,15 +135,29 @@ module.exports = React.createClass({
     return this.props.colorings[this.props.currentColoringIndex].label;
   },
 
+  renderControlToggle() {
+    if (this.props.active === true) {
+      return (
+        <button type="button" className="iconified focusable" onClick={this.handleLaiserFaireUser}>
+          <Icon id={scaryControlsIconId} width={20} height={20} /> Controls Scare Me
+        </button>
+      );
+    } else {
+      return (
+        <button type="button" className="iconified focusable" onClick={this.handleControlFreakUser}>
+          <Icon id={controlsIconId} width={20} height={20} /> I Need Control
+        </button>
+      );
+    }
+  },
+
   render() {
     return (
       <div>
         <div className="controls-container">
           <p id="rule-color-label">{this.currentRuleSetLabel()}, {this.currentColoringLabel()}</p>
           <div className="control-group">
-            <button type="button" className="iconified focusable">
-              <Icon id={controlsIconId} width={20} height={20} /> I Need Control
-            </button>
+            {this.renderControlToggle()}
           </div>
           <div className="control-group">
             <button type="button" className="iconified focusable" onClick={this.handleImpatientUser}>
@@ -130,7 +166,7 @@ module.exports = React.createClass({
           </div>
         </div>
 
-        <div className="controls-container">
+        <div id="controls-wrapper" className={this.controlsWrapperClassNames()}>
           <div className="control-group">
             <p>Initial State</p>
             <button type="button" className="focusable" onClick={this.handleStateClear}>Clear</button>
