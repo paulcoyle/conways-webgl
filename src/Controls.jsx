@@ -1,5 +1,10 @@
 var React = require('react')
+  , Icon = require('./Icon')
+  , SelectControl = require('./SelectControl')
   , RangeControl = require('./RangeControl')
+  , controlsIconId = require('../res/svg/control-dial.svg')
+  , scaryControlsIconId = require('../res/svg/scary-controls.svg')
+  , magicWandIconId = require('../res/svg/magic-wand.svg')
   , SPEED_LABELS = ['Slow', 'Normal', 'Fast']
   ;
 
@@ -15,6 +20,7 @@ module.exports = React.createClass({
 
   getDefaultProps() {
     return {
+      active: false,
       ruleSets: [],
       currentRuleSetIndex: -1,
       playing: false,
@@ -23,6 +29,8 @@ module.exports = React.createClass({
       offset: {
         x: 0, y: 0
       },
+      onActivate: () => {},
+      onDeactivate: () => {},
       onStateClear: () => {},
       onStateSeed: () => {},
       onRuleSetChange: () => {},
@@ -45,18 +53,6 @@ module.exports = React.createClass({
     }
   },
 
-  ruleOptions() {
-    return this.props.ruleSets.map((rule, i) => {
-      return <option key={i} value={i}>{rule.label}</option>
-    });
-  },
-
-  coloringOptions() {
-    return this.props.colorings.map((coloring, i) => {
-      return <option key={i} value={i}>{coloring.label}</option>
-    });
-  },
-
   handleStateClear() {
     this.props.onStateClear();
   },
@@ -65,12 +61,12 @@ module.exports = React.createClass({
     this.props.onStateSeed();
   },
 
-  handleRuleChange(e) {
-    this.props.onRuleSetChange(e.target.value);
+  handleRuleChange(index) {
+    this.props.onRuleSetChange(index);
   },
 
-  handleColoringChange(e) {
-    this.props.onColoringChange(e.target.value);
+  handleColoringChange(index) {
+    this.props.onColoringChange(index);
   },
 
   handleStep() {
@@ -97,8 +93,26 @@ module.exports = React.createClass({
     this.props.onScaleChange(newScale);
   },
 
+  handleControlFreakUser() {
+    this.props.onActivate();
+  },
+
+  handleLaiserFaireUser() {
+    this.props.onDeactivate();
+  },
+
   handleImpatientUser() {
     this.props.onImpatientUser();
+  },
+
+  controlsWrapperClassNames() {
+    var classes = ['controls-container'];
+
+    if (this.props.active === true) {
+      classes.push('active');
+    }
+
+    return classes.join(' ');
   },
 
   offsetX() {
@@ -113,32 +127,64 @@ module.exports = React.createClass({
     return Math.round(value * decimal) / decimal;
   },
 
+  currentRuleSetLabel() {
+    return this.props.ruleSets[this.props.currentRuleSetIndex].label;
+  },
+
+  currentColoringLabel() {
+    return this.props.colorings[this.props.currentColoringIndex].label;
+  },
+
+  renderControlToggle() {
+    if (this.props.active === true) {
+      return (
+        <button type="button" className="iconified focusable" onClick={this.handleLaiserFaireUser}>
+          <Icon id={scaryControlsIconId} width={20} height={20} /> Controls Scare Me
+        </button>
+      );
+    } else {
+      return (
+        <button type="button" className="iconified focusable" onClick={this.handleControlFreakUser}>
+          <Icon id={controlsIconId} width={20} height={20} /> I Need Control
+        </button>
+      );
+    }
+  },
+
   render() {
     return (
       <div>
         <div className="controls-container">
+          <p id="rule-color-label">{this.currentRuleSetLabel()}, {this.currentColoringLabel()}</p>
           <div className="control-group">
-            <button type="button" onClick={this.handleImpatientUser}>Just Do Something Cool</button>
+            {this.renderControlToggle()}
+          </div>
+          <div className="control-group">
+            <button type="button" className="iconified focusable" onClick={this.handleImpatientUser}>
+              <Icon id={magicWandIconId} width={20} height={20} /> Just Do Something
+            </button>
           </div>
         </div>
-        <div className="controls-container">
+
+        <div id="controls-wrapper" className={this.controlsWrapperClassNames()}>
           <div className="control-group">
             <p>Initial State</p>
-            <button type="button" onClick={this.handleStateClear}>Clear</button>
-            <button type="button" onClick={this.handleStateSeed}>Seed</button>
+            <button type="button" className="focusable" onClick={this.handleStateClear}>Clear</button>
+            <button type="button" className="focusable" onClick={this.handleStateSeed}>Seed</button>
           </div>
 
           <div className="control-group">
             <p>Rules</p>
-            <select value={this.props.currentRuleSetIndex} onChange={this.handleRuleChange}>
-              {this.ruleOptions()}
-            </select>
+            <SelectControl
+              options={this.props.ruleSets}
+              selected={this.props.currentRuleSetIndex}
+              onChange={this.handleRuleChange} />
           </div>
 
           <div className="control-group">
             <p>Simulation</p>
-            <button type="button" onClick={this.handleStep} disabled={this.props.playing}>Step</button>
-            <button type="button" onClick={this.handlePlayStop}>{this.getPlayStopLabel()}</button>
+            <button type="button" className="focusable" onClick={this.handleStep} disabled={this.props.playing}>Step</button>
+            <button type="button" className="focusable" onClick={this.handlePlayStop}>{this.getPlayStopLabel()}</button>
             <RangeControl
               id="speed"
               label="Speed"
@@ -151,7 +197,7 @@ module.exports = React.createClass({
 
           <div className="control-group">
             <p>Display</p>
-            <button type="button" onClick={this.handleDisplayReset}>Reset</button>
+            <button type="button" className="focusable" onClick={this.handleDisplayReset}>Reset</button>
             <RangeControl
               id="scale"
               label="Scale"
@@ -161,11 +207,13 @@ module.exports = React.createClass({
               valueLabelRounding="100"
               onChange={this.handleScaleChange} />
           </div>
+
           <div className="control-group">
             <p>Colouring</p>
-            <select value={this.props.currentColoringIndex} onChange={this.handleColoringChange}>
-              {this.coloringOptions()}
-            </select>
+            <SelectControl
+              options={this.props.colorings}
+              selected={this.props.currentColoringIndex}
+              onChange={this.handleColoringChange} />
           </div>
         </div>
       </div>

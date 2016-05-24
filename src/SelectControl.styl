@@ -1,0 +1,42 @@
+.select
+  position: relative
+  overflow: hidden
+  display: inline-block
+  width: 130px
+  height: 32px
+  color: #666
+  border-radius: 6px
+  border: none
+  box-shadow: 0px 0px 0px 1px #bbb
+  z-index: 0
+  transition: box-shadow 0.2s ease-in-out
+
+  &.focus
+    .icon
+      fill: #666
+
+  .icon
+    position: absolute
+    right: 4px
+    top: 8px
+    fill: #bbb
+    z-index: -1
+    transition: fill 0.2s ease-in-out
+
+  select
+    position: aboslute
+    background: transparent
+    border: 0
+    border-radius: 0px
+    outline: 0
+    padding: 5px
+    height: 32px
+    width: 150px
+    // Tell Safari not to OSX-ify the styling
+    -webkit-appearance: none
+
+// Attempt to get FF to remove the inner borders on select options.
+// Does not appear to work :( 
+select::-moz-focus-inner,
+option::-moz-focus-inner
+  border: 0

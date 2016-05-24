@@ -1,10 +1,32 @@
+#controls-wrapper
+  transform: translate(0px, 20px)
+  opacity: 0
+  transition: transform 0.2s ease-in-out,
+              opacity 0.2s ease-in-out
+
+  &.active
+    transform: translate(0px, 0px)
+    opacity: 1
+
+#rule-color-label
+  position: absolute
+  top: 0px
+  right: 0px
+  color: #666
+
 .controls-container
+  position: relative
   text-align: center
   user-select: none
+  border-top: 1px solid #ddd
+
+  &:first-child
+    border-top: none
 
 .control-group
   display: inline-block
-  padding: 10px 20px
+  vertical-align: top
+  padding: 20px 20px
   border-right: 1px solid #ddd
 
   &:last-child
@@ -22,22 +44,38 @@
   font-size: 12px
   color: #999
 
+.control-group .focusable
+  box-shadow: 0px 0px 0px 1px #bbb
+
+  &:focus, &.focus
+    outline: none
+    box-shadow: 0px 0px 0px 2px #666
+
 .control-group button
-  padding: 6px 10px
+  position: relative
+  height: 32px
+  padding: 0px 10px
+  color: #666
+  border-radius: 6px
   border: none
+  background-color: #fff
+  transition: box-shadow 0.2s ease-in-out,
+              color 0.2s ease-in-out
 
-.control-group select
-  height: 24px
+  &[disabled]
+    border-color: #ddd
+    color: #ddd
+    box-shadow: 0px 0px 0px 1px #ddd
 
-.control-group .coords
-  display: inline-block
-  font-family: monospace
-  cursor: default
+  &.iconified
+    padding-left: 38px
 
-  span
-    display: inline-block
-    width: 50px
-    overflow: hidden
-    text-align: right
-    vertical-align: middle
-    line-height: 14px
+  .icon
+    position: absolute
+    left: 10px
+    top: 5px
+    fill: #666
+
+// Handle FF outlining inner input labels
+button::-moz-focus-inner
+  border: 0
