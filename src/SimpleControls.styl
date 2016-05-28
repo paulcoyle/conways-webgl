@@ -1,0 +1,23 @@
+#simple-reset-button
+  position: absolute
+  top: 22px
+  right: 0px
+  font-size: 0.8em
+  height: 28px
+  padding-left: 30px
+  color: #888
+  box-shadow: 0px 0px 0px 1px #ccc
+  visibility: hidden
+  opacity: 0
+  transition: visibility 0.2s ease-in-out,
+              opacity 0.2s ease-in-out,
+              box-shadow 0.2s ease-in-out,
+              color 0.2s ease-in-out
+
+  &.active
+    visibility: visible
+    opacity: 1
+
+  .icon
+    left: 8px
+    fill: #888

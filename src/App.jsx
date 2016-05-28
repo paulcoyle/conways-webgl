@@ -1,6 +1,7 @@
 var React = require('react')
   , ReactDOM = require('react-dom')
   , Render = require('./Render')
+  , SimpleControls = require('./SimpleControls')
   , Controls = require('./Controls')
   , Rules = require('../lib/Rules')
   , Coloring = require('../lib/Coloring')
@@ -34,12 +35,30 @@ App = React.createClass({
     return this.state.ruleSets[this.state.currentRuleSetIndex];
   },
 
+  currentRuleSetLabel() {
+    var currentRuleSet = this.currentRuleSet();
+
+    return currentRuleSet ? currentRuleSet.label : '';
+  },
+
   currentColoring() {
     return this.state.colorings[this.state.currentColoringIndex];
   },
 
+  currentColoringLabel() {
+    var currentColoring = this.currentColoring();
+
+    return currentColoring ? currentColoring.label : '';
+  },
+
   currentFrameDuration() {
     return frameDurations[this.state.speed];
+  },
+
+  isResetEnabled() {
+    return this.state.scale !== 1.0 ||
+           this.state.offset.x !== 0.0 ||
+           this.state.offset.y !== 0.0;
   },
 
   setScale(scale) {
@@ -47,12 +66,12 @@ App = React.createClass({
     this.setState(this.state);
   },
 
-  handleControlsActivation() {
+  handleShowControls() {
     this.state.controlsActive = true;
     this.setState(this.state);
   },
 
-  handleControlsDeactivation() {
+  handleHideControls() {
     this.state.controlsActive = false;
     this.setState(this.state);
   },
@@ -146,29 +165,38 @@ App = React.createClass({
           onDrag={this.handleRenderDrag}
           onZoom={this.handleRenderZoom} />
 
-        <Controls
-          active={this.state.controlsActive}
-          ruleSets={this.state.ruleSets}
-          currentRuleSetIndex={this.state.currentRuleSetIndex}
-          colorings={this.state.colorings}
-          currentColoringIndex={this.state.currentColoringIndex}
-          playing={this.state.playing}
-          speed={this.state.speed}
-          scale={this.state.scale}
-          offset={this.state.offset}
-          onActivate={this.handleControlsActivation}
-          onDeactivate={this.handleControlsDeactivation}
-          onStateClear={this.handleStateClear}
-          onStateSeed={this.handleStateSeed}
-          onRuleSetChange={this.handleRuleSetChange}
-          onColoringChange={this.handleColoringChange}
-          onStep={this.handleStep}
-          onPlay={this.handlePlay}
-          onStop={this.handleStop}
-          onSpeedChange={this.handleSpeedChange}
-          onDisplayReset={this.handleDisplayReset}
-          onScaleChange={this.handleScaleChange}
-          onImpatientUser={this.handleImpatientUser} />
+        <div>
+          <SimpleControls
+            controlsVisible={this.state.controlsActive}
+            resetEnabled={this.isResetEnabled() && !this.state.controlsActive}
+            ruleSetLabel={this.currentRuleSetLabel()}
+            coloringLabel={this.currentColoringLabel()}
+            onShowControls={this.handleShowControls}
+            onHideControls={this.handleHideControls}
+            onImpatientUser={this.handleImpatientUser}
+            onReset={this.handleDisplayReset} />
+
+          <Controls
+            active={this.state.controlsActive}
+            ruleSets={this.state.ruleSets}
+            currentRuleSetIndex={this.state.currentRuleSetIndex}
+            colorings={this.state.colorings}
+            currentColoringIndex={this.state.currentColoringIndex}
+            playing={this.state.playing}
+            speed={this.state.speed}
+            scale={this.state.scale}
+            offset={this.state.offset}
+            onStateClear={this.handleStateClear}
+            onStateSeed={this.handleStateSeed}
+            onRuleSetChange={this.handleRuleSetChange}
+            onColoringChange={this.handleColoringChange}
+            onStep={this.handleStep}
+            onPlay={this.handlePlay}
+            onStop={this.handleStop}
+            onSpeedChange={this.handleSpeedChange}
+            onReset={this.handleDisplayReset}
+            onScaleChange={this.handleScaleChange} />
+        </div>
       </div>
     );
   }

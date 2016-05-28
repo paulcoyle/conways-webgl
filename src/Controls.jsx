@@ -2,9 +2,6 @@ var React = require('react')
   , Icon = require('./Icon')
   , SelectControl = require('./SelectControl')
   , RangeControl = require('./RangeControl')
-  , controlsIconId = require('../res/svg/control-dial.svg')
-  , scaryControlsIconId = require('../res/svg/scary-controls.svg')
-  , magicWandIconId = require('../res/svg/magic-wand.svg')
   , SPEED_LABELS = ['Slow', 'Normal', 'Fast']
   ;
 
@@ -29,8 +26,6 @@ module.exports = React.createClass({
       offset: {
         x: 0, y: 0
       },
-      onActivate: () => {},
-      onDeactivate: () => {},
       onStateClear: () => {},
       onStateSeed: () => {},
       onRuleSetChange: () => {},
@@ -39,9 +34,8 @@ module.exports = React.createClass({
       onPlay: () => {},
       onStop: () => {},
       onSpeedChange: () => {},
-      onDisplayReset: () => {},
-      onScaleChange: () => {},
-      onImpatientUser: () => {}
+      onReset: () => {},
+      onScaleChange: () => {}
     };
   },
 
@@ -85,8 +79,8 @@ module.exports = React.createClass({
     this.props.onSpeedChange(newSpeed);
   },
 
-  handleDisplayReset() {
-    this.props.onDisplayReset();
+  handleReset() {
+    this.props.onReset();
   },
 
   handleScaleChange(newScale) {
@@ -127,94 +121,57 @@ module.exports = React.createClass({
     return Math.round(value * decimal) / decimal;
   },
 
-  currentRuleSetLabel() {
-    return this.props.ruleSets[this.props.currentRuleSetIndex].label;
-  },
-
-  currentColoringLabel() {
-    return this.props.colorings[this.props.currentColoringIndex].label;
-  },
-
-  renderControlToggle() {
-    if (this.props.active === true) {
-      return (
-        <button type="button" className="iconified focusable" onClick={this.handleLaiserFaireUser}>
-          <Icon id={scaryControlsIconId} width={20} height={20} /> Controls Scare Me
-        </button>
-      );
-    } else {
-      return (
-        <button type="button" className="iconified focusable" onClick={this.handleControlFreakUser}>
-          <Icon id={controlsIconId} width={20} height={20} /> I Need Control
-        </button>
-      );
-    }
-  },
 
   render() {
     return (
-      <div>
-        <div className="controls-container">
-          <p id="rule-color-label">{this.currentRuleSetLabel()}, {this.currentColoringLabel()}</p>
-          <div className="control-group">
-            {this.renderControlToggle()}
-          </div>
-          <div className="control-group">
-            <button type="button" className="iconified focusable" onClick={this.handleImpatientUser}>
-              <Icon id={magicWandIconId} width={20} height={20} /> Just Do Something
-            </button>
-          </div>
+      <div id="controls-wrapper" className={this.controlsWrapperClassNames()}>
+        <div className="control-group">
+          <p>Initial State</p>
+          <button type="button" className="focusable" onClick={this.handleStateClear}>Clear</button>
+          <button type="button" className="focusable" onClick={this.handleStateSeed}>Seed</button>
         </div>
 
-        <div id="controls-wrapper" className={this.controlsWrapperClassNames()}>
-          <div className="control-group">
-            <p>Initial State</p>
-            <button type="button" className="focusable" onClick={this.handleStateClear}>Clear</button>
-            <button type="button" className="focusable" onClick={this.handleStateSeed}>Seed</button>
-          </div>
+        <div className="control-group">
+          <p>Rules</p>
+          <SelectControl
+            options={this.props.ruleSets}
+            selected={this.props.currentRuleSetIndex}
+            onChange={this.handleRuleChange} />
+        </div>
 
-          <div className="control-group">
-            <p>Rules</p>
-            <SelectControl
-              options={this.props.ruleSets}
-              selected={this.props.currentRuleSetIndex}
-              onChange={this.handleRuleChange} />
-          </div>
+        <div className="control-group">
+          <p>Simulation</p>
+          <button type="button" className="focusable" onClick={this.handleStep} disabled={this.props.playing}>Step</button>
+          <button type="button" className="focusable" onClick={this.handlePlayStop}>{this.getPlayStopLabel()}</button>
+          <RangeControl
+            id="speed"
+            label="Speed"
+            range={this.state.speedRange}
+            step="1"
+            value={this.props.speed}
+            valueLabel={SPEED_LABELS[this.props.speed]}
+            onChange={this.handleSpeedChange} />
+        </div>
 
-          <div className="control-group">
-            <p>Simulation</p>
-            <button type="button" className="focusable" onClick={this.handleStep} disabled={this.props.playing}>Step</button>
-            <button type="button" className="focusable" onClick={this.handlePlayStop}>{this.getPlayStopLabel()}</button>
-            <RangeControl
-              id="speed"
-              label="Speed"
-              range={this.state.speedRange}
-              step="1"
-              value={this.props.speed}
-              valueLabel={SPEED_LABELS[this.props.speed]}
-              onChange={this.handleSpeedChange} />
-          </div>
+        <div className="control-group">
+          <p>Display</p>
+          <button type="button" className="focusable" onClick={this.handleReset}>Reset</button>
+          <RangeControl
+            id="scale"
+            label="Scale"
+            range={this.state.scaleRange}
+            step="0.1"
+            value={this.props.scale}
+            valueLabelRounding="100"
+            onChange={this.handleScaleChange} />
+        </div>
 
-          <div className="control-group">
-            <p>Display</p>
-            <button type="button" className="focusable" onClick={this.handleDisplayReset}>Reset</button>
-            <RangeControl
-              id="scale"
-              label="Scale"
-              range={this.state.scaleRange}
-              step="0.1"
-              value={this.props.scale}
-              valueLabelRounding="100"
-              onChange={this.handleScaleChange} />
-          </div>
-
-          <div className="control-group">
-            <p>Colouring</p>
-            <SelectControl
-              options={this.props.colorings}
-              selected={this.props.currentColoringIndex}
-              onChange={this.handleColoringChange} />
-          </div>
+        <div className="control-group">
+          <p>Colouring</p>
+          <SelectControl
+            options={this.props.colorings}
+            selected={this.props.currentColoringIndex}
+            onChange={this.handleColoringChange} />
         </div>
       </div>
     );
